@@ -8,7 +8,7 @@ setuptools.setup(
     version="0.1.0",
     author="hiracky16",
     author_email="h.piiice16@gmail.com",
-    description="Can get fpl info by using this modules.",
+    description="Can get Fantasy Premier League information by using this modules.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/cm-hirano-shigetoshi/python_sample_command",
