@@ -1,5 +1,6 @@
 import requests
 from fpl_client.models.player import Player
+from fpl_client.models.team import Team
 
 class FPLClient:
     # fantasy premier league api base url
@@ -17,5 +18,10 @@ class FPLClient:
         path = "bootstrap-static/"
         res = self._get(path)
         elements = res['elements']
-        return [Player(e) for e in elements[0:5]]
+        return [Player(e) for e in elements]
         
+    def get_teams(self):
+        path = "bootstrap-static/"
+        res = self._get(path)
+        teams = res['teams']
+        return [Team(t) for t in teams]
