@@ -1,5 +1,5 @@
 import requests
-from .models.player import Player
+from fpl_client.models.player import Player
 
 class FPLClient:
     # fantasy premier league api base url
