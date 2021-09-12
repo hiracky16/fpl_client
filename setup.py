@@ -5,13 +5,13 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="fpl_client",
-    version="0.1.0",
+    version="0.1.1",
     author="hiracky16",
     author_email="h.piiice16@gmail.com",
     description="Can get Fantasy Premier League information by using this modules.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/cm-hirano-shigetoshi/python_sample_command",
+    url="https://github.com/hiracky16/fpl_client",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
