@@ -9,3 +9,6 @@ class FPLClient:
 
     def get_teams(self):
         return self.api.get_teams()
+
+    def get_fixtures(self, event=None):
+        return self.api.get_fixtures(event)

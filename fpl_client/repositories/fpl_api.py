@@ -1,3 +1,4 @@
+from fpl_client.models.fixture import Fixture
 from fpl_client.models.player import Player
 from fpl_client.models.team import Team
 import requests, datetime, json, os
@@ -45,7 +46,9 @@ class FPLApi:
         if self._is_valid_cache(path):
             return self._read_cache_file(path)
         else:
-            url = f"{self.BASE_URL}/{path}/"
+            url = f"{self.BASE_URL}/{path}"
+            if '?' in url:
+                url = url + '/'
             res = requests.get(url)
             data = res.json()
             self._write_cache_file(path, data)
@@ -62,3 +65,14 @@ class FPLApi:
         res = self._get(path)
         teams = res['teams']
         return [Team(t) for t in teams]
+
+    def get_fixtures(self, event=None):
+        path = f'fixtures?event={event}' if event else 'fixtures'
+        res = self._get(path)
+        teams = self.get_teams()
+        fixtures = []
+        for r in res:
+            fixture = Fixture(r)
+            fixture.set_team(teams)
+            fixtures.append(fixture)
+        return fixtures
