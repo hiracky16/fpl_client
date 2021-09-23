@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="fpl_client",
-    version="0.1.4",
+    version="0.1.5",
     author="hiracky16",
     author_email="h.piiice16@gmail.com",
     description="Can get Fantasy Premier League information by using this modules.",
