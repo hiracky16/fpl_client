@@ -1,27 +1,11 @@
-import requests
-from fpl_client.models.player import Player
-from fpl_client.models.team import Team
+from fpl_client.repositories.fpl_api import FPLApi
 
 class FPLClient:
-    # fantasy premier league api base url
-    BASE_URL = "https://fantasy.premierleague.com/api"
-
     def __init__(self):
-        1 # do something
+        self.api = FPLApi()
 
-    def _get(self, path):
-        url = f"{self.BASE_URL}/{path}"
-        res = requests.get(url)
-        return res.json()
-    
     def get_players(self):
-        path = "bootstrap-static/"
-        res = self._get(path)
-        elements = res['elements']
-        return [Player(e) for e in elements]
-        
+        return self.api.get_players()
+
     def get_teams(self):
-        path = "bootstrap-static/"
-        res = self._get(path)
-        teams = res['teams']
-        return [Team(t) for t in teams]
+        return self.api.get_teams()
