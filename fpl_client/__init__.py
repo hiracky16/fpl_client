@@ -1,8 +1,8 @@
-from fpl_client.repositories.fpl_api import FPLApi
+from fpl_client.repositories.fpl_repository import FPLRepository
 
 class FPLClient:
     def __init__(self):
-        self.api = FPLApi()
+        self.api = FPLRepository()
 
     def get_players(self):
         return self.api.get_players()
@@ -10,5 +10,5 @@ class FPLClient:
     def get_teams(self):
         return self.api.get_teams()
 
-    def get_fixtures(self, event=None):
-        return self.api.get_fixtures(event)
+    def get_fixtures(self, event=None, team_id=None):
+        return self.api.get_fixtures(event=event, team_id=team_id)

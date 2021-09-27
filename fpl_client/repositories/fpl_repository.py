@@ -4,7 +4,9 @@ from fpl_client.models.team import Team
 import requests, datetime, json, os
 from os.path import join, dirname
 
-class FPLApi:
+class FPLRepository:
+    """FPL API へリクエストしたり結果をキャッシュしたりする
+    """
     # fantasy premier league api base url
     BASE_URL = "https://fantasy.premierleague.com/api"
 
@@ -12,12 +14,25 @@ class FPLApi:
     THRESHHOLD_DAYS = 7
 
     def _generate_file_path(self, filename):
+        """キャッシュファイルのディレクトリ
+        Args:
+            filename ([String]): [キャッシュファイル]
+        Returns:
+            [String]: [キャッシュファイルのパス]
+        """
         current_dir = dirname(__file__)
         # NOTE: fpl_client/data/ 配下にするためのややこしい処理
         data_dir = '/'.join(current_dir.split('/')[:-1]) + '/data'
         return join(data_dir, filename)
 
     def _is_valid_cache(self, path):
+        """キャッシュが有効かチェックするメソッド
+        API のキャッシュは 7 日間有効
+        Args:
+            path ([String]): [API のパス]
+        Returns:
+            [Boolean]: [キャッシュの有効か]
+        """
         cache_date_file = self._generate_file_path(f"{path}.timestamp")
         if not os.path.exists(cache_date_file):
             return False
@@ -33,16 +48,33 @@ class FPLApi:
             return diff.days < self.THRESHHOLD_DAYS
 
     def _read_cache_file(self, path):
+        """API にリクエストせずキャッシュを読む
+        Args:
+            path ([String]): [API のパス]
+        Returns:
+            [dict]: [API のレスポンス]
+        """
         with open(self._generate_file_path(f"{path}.json")) as f:
             return json.load(f)
 
     def _write_cache_file(self, path, data):
+        """API のレスポンスをキャッシュするためのメソッド
+        Args:
+            path ([type]): [API のパス]
+            data ([dict]): [キャッシュする API のレスポンス]
+        """
         with open(self._generate_file_path(f"{path}.json"), 'w') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
         with open(self._generate_file_path(f"{path}.timestamp"), 'w') as f:
             f.write(f'{datetime.date.today()}')
 
     def _get(self, path):
+        """Fantasy Premier League API への HTTP リクエスト
+        Args:
+            path ([String ]): [API のパス]
+        Returns:
+            [dict]: [API のレスポンスを dict 型に変換したもの]
+        """
         if self._is_valid_cache(path):
             return self._read_cache_file(path)
         else:
@@ -55,24 +87,41 @@ class FPLApi:
             return data
 
     def get_players(self):
+        """選手一覧を返す
+        Returns:
+            players [Player]: [選手一覧]
+        """
         path = "bootstrap-static"
         res = self._get(path)
         elements = res['elements']
         return [Player(e) for e in elements]
 
     def get_teams(self):
+        """チーム一覧を取得
+        Returns:
+            teams [Team]: [チーム一覧]
+        """
         path = "bootstrap-static"
         res = self._get(path)
         teams = res['teams']
         return [Team(t) for t in teams]
 
-    def get_fixtures(self, event=None):
+    def get_fixtures(self, event=None, team_id=None):
+        """試合結果を返すメソッド
+        Args:
+            event ([type], optional): [第何節目か]. Defaults to None.
+            team_id ([type], optional): [チームを限定する]. Defaults to None.
+        Returns:
+            fixtures [Fixture]: [結果一覧]
+        """
         path = f'fixtures?event={event}' if event else 'fixtures'
         res = self._get(path)
         teams = self.get_teams()
         fixtures = []
         for r in res:
-            fixture = Fixture(r)
-            fixture.set_team(teams)
+            fixture = Fixture(obj=r, teams=teams)
+            if team_id and \
+                (fixture.away_team_id != team_id and fixture.home_team_id != team_id):
+                continue
             fixtures.append(fixture)
         return fixtures
