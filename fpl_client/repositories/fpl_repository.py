@@ -1,6 +1,7 @@
 from fpl_client.models.fixture import Fixture
 from fpl_client.models.player import Player
 from fpl_client.models.team import Team
+from fpl_client.models.event_element import EventElement
 import requests, datetime, json, os
 from os.path import join, dirname
 
@@ -63,9 +64,10 @@ class FPLRepository:
             path ([type]): [API のパス]
             data ([dict]): [キャッシュする API のレスポンス]
         """
-        with open(self._generate_file_path(f"{path}.json"), 'w') as f:
+        file_name = path.replace("/", "_")
+        with open(self._generate_file_path(f"{file_name}.json"), 'w') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
-        with open(self._generate_file_path(f"{path}.timestamp"), 'w') as f:
+        with open(self._generate_file_path(f"{file_name}.timestamp"), 'w') as f:
             f.write(f'{datetime.date.today()}')
 
     def _get(self, path):
@@ -79,10 +81,13 @@ class FPLRepository:
             return self._read_cache_file(path)
         else:
             url = f"{self.BASE_URL}/{path}"
-            if '?' in url:
+            if '?' not in url:
                 url = url + '/'
             res = requests.get(url)
             data = res.json()
+            if len(data.keys()) == 0:
+                raise "no keys"
+
             self._write_cache_file(path, data)
             return data
 
@@ -125,3 +130,15 @@ class FPLRepository:
                 continue
             fixtures.append(fixture)
         return fixtures
+
+
+    def get_event_live(self, event):
+        """節ごとの選手のパフォーマンスを返す
+
+        Args:
+            event [Integer]: 第 n 節
+        """
+        path = f'event/{event}/live'
+        res = self._get(path)
+        elements = res['elements']
+        return [EventElement(e) for e in elements]
