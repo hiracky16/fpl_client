@@ -1,7 +1,15 @@
 class Player:
     def __init__(self, obj={}):
-        self.first_name = obj['first_name']
-        self.second_name = obj['second_name']
+        attributes = [
+            'id',
+            'first_name',
+            'second_name',
+            'total_points',
+            'points_per_game',
+            'minutes'
+        ]
+        for a in attributes:
+            exec(f"self.{a} = obj['{a}']")
 
     def full_name(self):
         return f"{self.first_name} {self.second_name}"
